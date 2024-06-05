@@ -90,14 +90,40 @@ export default function Controller() {
     if (path.length === 1) {
       temp.operands.splice(path[0], 1);
     }
+
     if (path.length === 2) {
       temp.operands[path[0]].sub_operation.operands.splice(path[1], 1);
+      if (
+        temp.operands[path[0]].sub_operation.operands.length === 0 &&
+        temp.operands[path[0]].filter_group
+      ) {
+        if (temp.operands.length <= 1)
+          temp.operands[path[0]].filter_group = false;
+        else temp.operands.splice(path[0], 1);
+      }
     }
+
     if (path.length === 3) {
       temp.operands[path[0]].sub_operation.operands[
         path[1]
       ].sub_operation.operands.splice(path[2], 1);
+      if (
+        temp.operands[path[0]].sub_operation.operands[path[1]].sub_operation
+          .operands.length === 0 &&
+        temp.operands[path[0]].sub_operation.operands[path[1]].filter_group
+      ) {
+        temp.operands[path[0]].sub_operation.operands.splice(path[1], 1);
+        if (
+          temp.operands[path[0]].sub_operation.operands.length === 0 &&
+          temp.operands[path[0]].filter_group
+        ) {
+          if (temp.operands.length <= 1)
+            temp.operands[path[0]].filter_group = false;
+          else temp.operands.splice(path[0], 1);
+        }
+      }
     }
+    // if (temp?.operands.length === 1 && path.length === 0 && index === 0)
     setForm(temp);
   };
 
@@ -186,14 +212,19 @@ export default function Controller() {
               </div>
               <RiDeleteBinLine
                 color={
-                  form?.operands.length === 1 && index === 0
+                  form?.operands.length === 1 &&
+                  path.length === 0 &&
+                  index === 0
                     ? "grey"
                     : "#EF5055"
                 }
                 size={18}
                 onClick={() =>
-                  !(form?.operands.length === 1 && index === 0) &&
-                  handleDelete([...path, index])
+                  !(
+                    form?.operands.length === 1 &&
+                    path.length === 0 &&
+                    index === 0
+                  ) && handleDelete([...path, index])
                 }
               />
             </div>
